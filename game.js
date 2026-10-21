@@ -496,7 +496,13 @@
     card.innerHTML =
       '<div class="row"><div class="star"><svg width="30" height="30" viewBox="0 0 24 24"><path fill="#2B2B2B" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.2l7.1-.6z"/></svg></div>' +
       '<div><div class="t">Telegram Premium</div><div class="s">Подарок для ' + (C.nameFor || C.name || '') + '</div></div></div>' +
-      '<div class="acts"></div><div class="linktext"></div>';
+      '<div class="acts"></div>' +
+      '<div class="how"><b>Как забрать на iPhone</b><ol>' +
+      '<li>Нажми «Забрать подарок», откроется Telegram.</li>' +
+      '<li>Внизу экрана нажми на сумму покупки: Premium активируется бесплатно.</li>' +
+      '<li>Не открылось? Скопируй ссылку, отправь себе в «Избранное» и перейди по ней оттуда.</li></ol>' +
+      '<span>На аккаунте не должно быть активного Premium.</span></div>' +
+      '<div class="linktext"></div>';
     var a = document.createElement('a');
     a.className = 'btn'; a.textContent = 'Забрать подарок'; a.href = link; a.target = '_blank'; a.rel = 'noopener noreferrer';
     var b = document.createElement('button');
