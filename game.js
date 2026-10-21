@@ -65,6 +65,72 @@
     screens.forEach(function (s) { $('#' + s).classList.toggle('active', s === id); });
   }
 
+  /* ---------- звук: своя музыка и эффекты на WebAudio, без файлов ---------- */
+  var Snd = (function () {
+    var ac, master, on = true, timer, step = 0, next = 0, started = false, STEP = 60 / 132 / 2;
+    var A = [[76,79,76,72,76,79,84,79],[81,79,76,72,74,76,79,76],[77,81,77,72,77,81,84,81],[79,77,74,71,74,77,79,0],
+             [84,79,76,79,84,79,76,72],[81,76,72,76,81,84,81,76],[77,81,84,81,77,72,77,81],[79,74,71,74,79,83,84,0]];
+    var BASS = [48, 45, 41, 43];
+    try { on = localStorage.getItem('yana-snd') !== '0'; } catch (e) {}
+    function hz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+    function tone(type, f, t, d, v, f2) {
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .012); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .05);
+    }
+    function hat(t) {
+      var n = ac.sampleRate * .04, b = ac.createBuffer(1, n, ac.sampleRate), d = b.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      var s = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
+      f.type = 'highpass'; f.frequency.value = 6000; g.gain.value = .05;
+      s.buffer = b; s.connect(f); f.connect(g); g.connect(master); s.start(t);
+    }
+    function sched() {
+      while (next < ac.currentTime + .15) {
+        var bar = Math.floor(step / 8) % 8, k = step % 8, m = A[bar][k];
+        if (m) tone('square', hz(m), next, STEP * .9, .035);
+        var root = BASS[bar % 4];
+        if (k === 0 || k === 4) tone('triangle', hz(root), next, STEP * 1.6, .11);
+        else if (k === 2 || k === 6) tone('triangle', hz(root + 7), next, STEP * .9, .06);
+        if (k % 2 === 1) hat(next);
+        next += STEP; step++;
+      }
+    }
+    function setVol() { if (master) master.gain.setTargetAtTime(on ? .55 : 0, ac.currentTime, .05); }
+    return {
+      start: function () {
+        try {
+          if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.connect(ac.destination); setVol(); }
+          if (ac.state === 'suspended') ac.resume();
+          if (!started) { started = true; next = ac.currentTime + .08; timer = setInterval(sched, 30); }
+        } catch (e) {}
+      },
+      toggle: function () {
+        on = !on; try { localStorage.setItem('yana-snd', on ? '1' : '0'); } catch (e) {}
+        if (!ac) this.start(); setVol(); return on;
+      },
+      isOn: function () { return on; },
+      pause: function (h) { if (!ac) return; if (h) ac.suspend(); else if (started) ac.resume(); },
+      sfx: function (k) {
+        if (!ac || !on) return;
+        var t = ac.currentTime;
+        if (k === 'catch') tone('sine', 660, t, .12, .16, 1250);
+        else if (k === 'ok') { tone('triangle', hz(72), t, .12, .16); tone('triangle', hz(76), t + .08, .12, .16); tone('triangle', hz(79), t + .16, .2, .16); }
+        else if (k === 'bad') tone('sawtooth', 220, t, .28, .09, 110);
+        else if (k === 'flip') tone('sine', 520, t, .07, .12, 760);
+        else if (k === 'win') [72, 76, 79, 84, 88].forEach(function (m, i) { tone('triangle', hz(m), t + i * .1, .35, .17); });
+      }
+    };
+  })();
+  document.addEventListener('visibilitychange', function () { Snd.pause(document.hidden); });
+  (function mkToggle() {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'snd-btn'; b.setAttribute('aria-label', 'Звук');
+    function paint() { b.textContent = Snd.isOn() ? '🔊' : '🔇'; }
+    b.addEventListener('click', function () { Snd.toggle(); paint(); });
+    paint(); document.body.appendChild(b);
+  })();
+
   /* ---------- 1. заставка ---------- */
   function initSplash() {
     $('#sp-title').innerHTML = (C.splash && C.splash.title) || 'Тебе посылка';
@@ -74,6 +140,7 @@
     fillPeeks($('#s-splash'), 0);
     btn.addEventListener('click', function () {
       btn.disabled = true;
+      Snd.start();
       $('#box').classList.add('open');
       setTimeout(function () { show('s-quiz'); renderQ(); }, reduce ? 80 : 1150);
     });
@@ -122,6 +189,7 @@
       qLock = true;
       btn.classList.add('ok');
       say(PRAISE[qi % PRAISE.length]);
+      Snd.sfx('ok');
       react('ok');
       $('#q-fill').style.width = ((qi + 1) / Q.length * 100) + '%';
       setTimeout(function () { qi++; renderQ(); }, 950);
@@ -130,6 +198,7 @@
       btn.disabled = true;
       var w = Array.isArray(q.wrong) ? q.wrong[i] : q.wrong;
       say(w || 'Не-а. Ещё разок.');
+      Snd.sfx('bad');
       react('bad');
     }
   }
@@ -253,7 +322,7 @@
       it.y += it.vy * dt; it.rot += it.vr * dt;
       var bottom = it.y + it.s * .3;
       if (bottom >= b.y && it.y <= b.y + 22 && Math.abs(it.x - G.px) < b.w / 2 + it.s * .15) {
-        G.score++; G.fl.push({ x: it.x, y: b.y - 10, t: 0 }); G.items.splice(i, 1); hud();
+        Snd.sfx('catch'); G.score++; G.fl.push({ x: it.x, y: b.y - 10, t: 0 }); G.items.splice(i, 1); hud();
         if (G.score >= G.goal) { endRound(true); return; }
       } else if (it.y > G.h + it.s) G.items.splice(i, 1);
     }
@@ -276,6 +345,7 @@
   function endRound(win) {
     G.run = false;
     if (win) {
+      Snd.sfx('win');
       overlay('Поймала!', 'Все друзья в корзине. Но они разбежались по парам, надо собрать.', 'Дальше', startMemory);
       return;
     }
@@ -305,12 +375,12 @@
       b.querySelector('img').src = p[id].src;
       b.addEventListener('click', function () {
         if (lock || b.classList.contains('flip')) return;
-        b.classList.add('flip'); open.push(b);
+        b.classList.add('flip'); Snd.sfx('flip'); open.push(b);
         if (open.length < 2) return;
         moves++; say.textContent = 'Ходов: ' + moves;
         var a = open[0], c = open[1]; open = [];
         if (a.dataset.id === c.dataset.id) {
-          a.classList.add('done'); c.classList.add('done'); matched++;
+          a.classList.add('done'); c.classList.add('done'); matched++; Snd.sfx('ok');
           if (matched === n) {
             say.textContent = 'Все пары собраны за ' + moves + ' ход.';
             lsSet(FLAG, '1');
@@ -351,6 +421,9 @@
     buildOrbit();
     var cvs = $('#cv-scratch'); scratch.cv = cvs; scratch.ctx = cvs.getContext('2d'); scratch.done = false;
     cvs.classList.remove('gone');
+    $('#f-hint').classList.remove('gone');
+    $('#gift-slot').innerHTML = '';
+    if (!skip) $('#s-final').classList.add('locked');
     if (skip) { reveal(true); return; }
     requestAnimationFrame(function () { initScratch(); });
   }
@@ -372,6 +445,7 @@
     s.n = 0; s.down = false;
     if (!s.bound) {
       s.bound = true;
+      ['touchstart', 'touchmove'].forEach(function (n) { s.cv.addEventListener(n, function (e) { e.preventDefault(); }, { passive: false }); });
       var pt = function (e) { var r2 = s.cv.getBoundingClientRect(); return [e.clientX - r2.left, e.clientY - r2.top]; };
       s.cv.addEventListener('pointerdown', function (e) {
         if (s.done) return;
@@ -407,7 +481,8 @@
     scratch.cv.classList.add('gone');
     $('#f-hint').classList.add('gone');
     renderGift();
-    if (!quiet) confetti();
+    $('#s-final').classList.remove('locked');
+    if (!quiet) { confetti(); Snd.sfx('win'); }
   }
   function renderGift() {
     var link = getLink(), slot = $('#gift-slot');

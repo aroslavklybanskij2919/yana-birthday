@@ -138,3 +138,15 @@ h2{margin:0;font-size:clamp(25px,7.4vw,32px);line-height:1.12;letter-spacing:-.0
 .back{transform:rotateY(180deg);background:var(--card);border:2px solid var(--line)}
 .back img{width:88%;height:88%;object-fit:contain;filter:drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff)}
 .card.done .back{background:var(--y);border-color:var(--y2)}
+
+/* звук */
+.snd{margin:14px 0 0;font-size:14px;line-height:1.35;color:var(--ink2);max-width:290px}
+.snd-btn{position:fixed;z-index:60;right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);width:42px;height:42px;border-radius:50%;
+  border:2px solid var(--line);background:var(--card);box-shadow:var(--shadow);font-size:20px;line-height:1;padding:0;cursor:pointer}
+
+/* финал: ничего не прыгает, пока стираешь */
+#s-final .center{margin:3vh 0 0}
+#s-final.locked{overflow:hidden;touch-action:none;overscroll-behavior:none}
+.hint{visibility:visible}
+.hint.gone{opacity:0;height:auto;margin:6px 0 0}
+#gift-slot{width:100%}
