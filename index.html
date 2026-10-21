@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#FFF8E7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Яне — посылка</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+
+  <!-- 1. Заставка -->
+  <section id="s-splash" class="screen active noselect">
+    <img class="peek sp-pile" data-pool="decor" data-i="0" alt="">
+    <img class="peek sp-chain" data-pool="decor" data-i="4" alt="">
+    <div class="center">
+      <h1 id="sp-title"></h1>
+      <p class="sub" id="sp-text"></p>
+      <div class="boxwrap" id="box">
+        <img class="in in-heart" data-pool="decor" data-i="3" alt="">
+        <img class="in in-l" data-pool="items" data-i="0" alt="">
+        <img class="in in-r" data-pool="items" data-i="1" alt="">
+        <div class="body"><span class="rib"></span></div>
+        <div class="lid"><span class="rib"></span><span class="bow"><i></i><i></i><b></b></span></div>
+      </div>
+      <button class="btn" id="btn-open" type="button"></button>
+    </div>
+  </section>
+
+  <!-- 2. Квиз -->
+  <section id="s-quiz" class="screen noselect">
+    <img class="peek q1" data-pool="items" data-i="0" alt="">
+    <img class="peek q2" data-pool="items" data-i="1" alt="">
+    <img class="peek q3" data-pool="items" data-i="2" alt="">
+    <div class="progress" aria-hidden="true"><i id="q-fill"></i></div>
+    <div class="center quiz">
+      <div class="kicker" id="q-count"></div>
+      <h2 id="q-text"></h2>
+      <div class="opts" id="q-opts"></div>
+      <div class="bubble" id="q-say" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3. Игра -->
+  <section id="s-game" class="screen noselect">
+    <canvas id="cv-game"></canvas>
+    <div class="hud"><span class="chip" id="g-time">20</span><span class="chip" id="g-score">0 / 10</span></div>
+    <div class="overlay" id="g-overlay">
+      <div class="ocard">
+        <h2 id="g-title"></h2>
+        <p id="g-text"></p>
+        <button class="btn" id="g-btn" type="button"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3б. Найди пары -->
+  <section id="s-memory" class="screen noselect">
+    <div class="center">
+      <div class="kicker">Ещё одна мелочь</div>
+      <h2>Найди пары</h2>
+      <div class="grid" id="m-grid"></div>
+      <div class="bubble show" id="m-say"></div>
+    </div>
+  </section>
+
+  <!-- 4. Финал -->
+  <section id="s-final" class="screen">
+    <div class="center final">
+      <div class="stage noselect" id="stage">
+        <div class="orbit" id="orbit"></div>
+        <div class="greet" id="greet">
+          <h2 id="f-title"></h2>
+          <p id="f-text"></p>
+        </div>
+        <canvas id="cv-scratch"></canvas>
+      </div>
+      <p class="hint noselect" id="f-hint">Сотри защитный слой</p>
+      <div id="gift-slot"></div>
+    </div>
+  </section>
+
+</main>
+<canvas id="confetti"></canvas>
+<script src="config.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
