@@ -124,6 +124,10 @@
     };
   })();
   document.addEventListener('visibilitychange', function () { Snd.pause(document.hidden); });
+  // первое касание на любом экране запускает музыку, дальше страхует от остановки системой
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (n) {
+    document.addEventListener(n, function () { Snd.start(); }, { passive: true });
+  });
   (function mkToggle() {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'snd-btn'; b.setAttribute('aria-label', 'Звук');
     function paint() { b.textContent = Snd.isOn() ? '🔊' : '🔇'; }
