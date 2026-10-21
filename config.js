@@ -5,8 +5,8 @@ window.CONFIG = {
 
   // Настоящая ссылка в base64. Пример, как получить:
   //   PowerShell: [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('https://t.me/giftcode/XXXX'))
-  // Сейчас стоит плейсхолдер https://t.me/giftcode/REPLACE_ME
-  giftLink: "aHR0cHM6Ly90Lm1lL2dpZnRjb2RlL1JFUExBQ0VfTUU=",
+  // Сейчас стоит настоящая ссылка на подарок
+  giftLink: "aHR0cHM6Ly90Lm1lL2dpZnRjb2RlLzhwcmlFdDRjdUZJaENBQUFYanJ4amhGUzhXOA==",
 
   // Для проверки: открой страницу с ?test=1 (и ?reset=1, чтобы сбросить прохождение)
   testLink: "https://t.me/giftcode/TEST",
